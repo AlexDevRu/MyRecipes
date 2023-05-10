@@ -27,4 +27,16 @@ class RepositoryImpl @Inject constructor(
         recipesDao.insertRecipe(recipe.toEntity(gson))
     }
 
+    override suspend fun deleteRecipe(recipe: Recipe) = withContext(Dispatchers.IO) {
+        recipesDao.deleteRecipe(recipe.toEntity(gson))
+    }
+
+    override suspend fun getRecipeById(id: Long) = withContext(Dispatchers.IO) {
+        recipesDao.getRecipeById(id)?.toDomainModel(gson)
+    }
+
+    override suspend fun updateRecipe(recipe: Recipe) = withContext(Dispatchers.IO) {
+        recipesDao.updateRecipe(recipe.toEntity(gson))
+    }
+
 }

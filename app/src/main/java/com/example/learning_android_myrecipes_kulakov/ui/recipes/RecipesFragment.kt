@@ -67,8 +67,8 @@ class RecipesFragment : Fragment(), RecipesAdapter.Listener, MenuProvider {
         //searchView?.setOnQueryTextListener(this)
     }
 
-    private fun openAddRecipeFragment(id: String? = null, edit: Boolean = false) {
-        val fragment = AddRecipeFragment.createInstance()
+    private fun openAddRecipeFragment(id: Long = -1, edit: Boolean = false) {
+        val fragment = AddRecipeFragment.createInstance(id, edit)
         (requireActivity() as MainActivity).setFragment(fragment)
     }
 
@@ -90,15 +90,20 @@ class RecipesFragment : Fragment(), RecipesAdapter.Listener, MenuProvider {
     }
 
     override fun onItemView(recipe: Recipe) {
-
+        openAddRecipeFragment(recipe.id)
     }
 
     override fun onItemEdit(recipe: Recipe) {
-
+        openAddRecipeFragment(recipe.id, true)
     }
 
     override fun onItemDelete(recipe: Recipe) {
-
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.delete)
+            .setMessage(R.string.delete_confirmation)
+            .setPositiveButton(android.R.string.ok) { _, _ -> viewModel.deleteRecipe(recipe) }
+            .setNegativeButton(android.R.string.cancel) { dialog, _ -> dialog.dismiss() }
+            .show()
     }
 
 }

@@ -1,12 +1,11 @@
 package com.example.learning_android_myrecipes_kulakov.ui.binding_adapters
 
 import android.net.Uri
-import android.widget.ArrayAdapter
-import android.widget.AutoCompleteTextView
-import android.widget.ImageView
-import android.widget.TextView
+import android.widget.*
 import androidx.core.view.size
 import androidx.databinding.BindingAdapter
+import androidx.databinding.InverseBindingAdapter
+import androidx.databinding.InverseBindingListener
 import com.bumptech.glide.Glide
 import com.example.learning_android_myrecipes_kulakov.R
 import com.example.learning_android_myrecipes_kulakov.Utils
@@ -39,6 +38,21 @@ fun setDate(textView: TextView, date: Long) {
 fun setDropdownValues(textView: AutoCompleteTextView, dropdownValues: Array<out String>) {
     val adapter = ArrayAdapter(textView.context, android.R.layout.simple_list_item_1, dropdownValues)
     textView.setAdapter(adapter)
+}
+
+@BindingAdapter("selectedValue")
+fun setSelectedValue(textView: AutoCompleteTextView, selectedValue: String?) {
+    textView.setText(selectedValue, false)
+}
+
+@InverseBindingAdapter(attribute = "selectedValue")
+fun getSelectedValue(textView: AutoCompleteTextView) : String? {
+    return textView.text?.toString()
+}
+
+@BindingAdapter("selectedValueAttrChanged")
+fun setSelectedValueListener(textView: AutoCompleteTextView, attrChange: InverseBindingListener) {
+    textView.onItemClickListener = AdapterView.OnItemClickListener { _, _, _, _ -> attrChange.onChange() }
 }
 
 @BindingAdapter("app:chipValues")

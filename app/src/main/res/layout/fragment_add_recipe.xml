@@ -61,7 +61,7 @@
                     android:id="@+id/etCategory"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@={viewModel.category}"
+                    app:selectedValue="@={viewModel.category}"
                     app:dropdownValues="@{viewModel.categories}"
                     android:inputType="none" />
 

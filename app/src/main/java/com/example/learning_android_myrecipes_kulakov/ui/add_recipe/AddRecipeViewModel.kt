@@ -6,7 +6,9 @@ import androidx.databinding.ObservableField
 import androidx.lifecycle.*
 import com.example.domain.models.Category
 import com.example.domain.models.Recipe
+import com.example.domain.use_cases.GetRecipeByIdUseCase
 import com.example.domain.use_cases.InsertRecipeUseCase
+import com.example.domain.use_cases.UpdateRecipeUseCase
 import com.example.learning_android_myrecipes_kulakov.R
 import com.example.learning_android_myrecipes_kulakov.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,6 +22,9 @@ import javax.inject.Inject
 @HiltViewModel
 class AddRecipeViewModel @Inject constructor(
     @ApplicationContext context: Context,
+    savedStateHandle: SavedStateHandle,
+    private val getRecipeByIdUseCase: GetRecipeByIdUseCase,
+    private val updateRecipeUseCase: UpdateRecipeUseCase,
     private val insertRecipeUseCase: InsertRecipeUseCase
 ) : ViewModel() {
 
@@ -45,6 +50,24 @@ class AddRecipeViewModel @Inject constructor(
         Utils.formatDate(it)
     }
 
+    private val editMode = savedStateHandle.get<Boolean>(AddRecipeFragment.EDIT) == true
+    private val id = savedStateHandle.get<Long>(AddRecipeFragment.ID)
+
+    init {
+        if (id != null && id >= 0)
+            viewModelScope.launch {
+                val recipe = getRecipeByIdUseCase(id)
+                if (recipe != null) {
+                    _imageUri.value = Uri.parse(recipe.photo)
+                    name.set(recipe.name)
+                    category.set(categories[recipe.category.ordinal])
+                    description.set(recipe.description)
+                    ingredients.set(recipe.ingredients)
+                    _time.value = recipe.time
+                }
+            }
+    }
+
     fun setTime(hours: Int, minutes: Int) {
         calendar.set(Calendar.HOUR, hours)
         calendar.set(Calendar.MINUTE, minutes)
@@ -62,7 +85,7 @@ class AddRecipeViewModel @Inject constructor(
     fun save() {
         viewModelScope.launch {
             val recipe = Recipe(
-                id = 0,
+                id = id ?: 0,
                 name = name.get().orEmpty(),
                 category = Category.values()[categories.indexOf(category.get())],
                 ingredients = ingredients.get().orEmpty(),
@@ -70,7 +93,10 @@ class AddRecipeViewModel @Inject constructor(
                 photo = imageUri.value?.toString(),
                 time = _time.value!!,
             )
-            insertRecipeUseCase(recipe)
+            if (editMode)
+                updateRecipeUseCase(recipe)
+            else
+                insertRecipeUseCase(recipe)
             _finish.emit(Unit)
         }
     }

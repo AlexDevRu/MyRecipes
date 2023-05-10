@@ -11,20 +11,23 @@ import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.TimePicker
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
+import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.learning_android_myrecipes_kulakov.R
+import com.example.learning_android_myrecipes_kulakov.Utils.disable
 import com.example.learning_android_myrecipes_kulakov.databinding.FragmentAddRecipeBinding
+import com.google.android.material.textfield.TextInputLayout
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -58,6 +61,8 @@ class AddRecipeFragment : Fragment(), View.OnClickListener, DialogInterface.OnCl
         }
     }
 
+    private var editMode = false
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -72,9 +77,26 @@ class AddRecipeFragment : Fragment(), View.OnClickListener, DialogInterface.OnCl
         binding.viewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
 
-        binding.ivPhoto.setOnClickListener(this)
-        binding.etTime.setOnClickListener(this)
-        binding.chipAddIngredient.setOnClickListener(this)
+        val addMode = requireArguments().getLong(ID) < 0
+        editMode = requireArguments().getBoolean(EDIT, false) && !addMode
+
+        binding.btnSave.isVisible = editMode || addMode
+
+        if (!editMode && !addMode) {
+            binding.etName.disable()
+            binding.etCategory.isClickable = false
+            binding.etCategory.isFocusable = false
+            binding.tlCategory.endIconMode = TextInputLayout.END_ICON_NONE
+            binding.etDescription.disable()
+            binding.chipAddIngredient.isVisible = false
+        }
+
+        if (editMode || addMode) {
+            binding.btnSave.setOnClickListener(this)
+            binding.ivPhoto.setOnClickListener(this)
+            binding.etTime.setOnClickListener(this)
+            binding.chipAddIngredient.setOnClickListener(this)
+        }
 
         observe()
     }
@@ -146,8 +168,14 @@ class AddRecipeFragment : Fragment(), View.OnClickListener, DialogInterface.OnCl
     }
 
     companion object {
-        fun createInstance() : AddRecipeFragment {
+        const val ID = "ID"
+        const val EDIT = "EDIT"
+        fun createInstance(id: Long = 0, edit: Boolean = false) : AddRecipeFragment {
             val fragment = AddRecipeFragment()
+            fragment.arguments = bundleOf(
+                ID to id,
+                EDIT to edit
+            )
             return fragment
         }
     }
