@@ -8,12 +8,12 @@ import com.example.domain.models.Category
 import com.example.domain.models.Recipe
 import com.example.domain.use_cases.InsertRecipeUseCase
 import com.example.learning_android_myrecipes_kulakov.R
+import com.example.learning_android_myrecipes_kulakov.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
@@ -42,8 +42,7 @@ class AddRecipeViewModel @Inject constructor(
 
     private val _time = MutableLiveData(0L)
     val timeAsString = _time.map {
-        val simpleDateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-        simpleDateFormat.format(it)
+        Utils.formatDate(it)
     }
 
     fun setTime(hours: Int, minutes: Int) {
