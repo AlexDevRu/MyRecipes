@@ -1,12 +1,15 @@
-package com.example.learning_android_myrecipes_kulakov.main
+package com.example.learning_android_myrecipes_kulakov.ui.main
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.example.learning_android_myrecipes_kulakov.R
-import com.example.learning_android_myrecipes_kulakov.recipes.RecipesFragment
+import com.example.learning_android_myrecipes_kulakov.ui.recipes.RecipesFragment
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,5 +36,15 @@ class MainActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedList
             return true
         }
         return false
+    }
+
+    private fun isLandscapeOrTablet() = false//binding.fragmentContainerRight != null
+
+    fun setFragment(fragment: Fragment) {
+        //val fragmentContainerId = if (isLandscapeOrTablet()) R.id.fragmentContainerRight else R.id.fragmentContainerLeft
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragmentContainerLeft, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 }
