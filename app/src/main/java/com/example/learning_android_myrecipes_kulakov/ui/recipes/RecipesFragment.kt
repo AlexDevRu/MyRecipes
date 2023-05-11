@@ -1,5 +1,6 @@
 package com.example.learning_android_myrecipes_kulakov.ui.recipes
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AlertDialog
@@ -12,6 +13,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.domain.models.Recipe
+import com.example.domain.models.SortOrder
 import com.example.learning_android_myrecipes_kulakov.R
 import com.example.learning_android_myrecipes_kulakov.databinding.FragmentRecipesBinding
 import com.example.learning_android_myrecipes_kulakov.ui.adapters.RecipesAdapter
@@ -22,7 +24,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class RecipesFragment : Fragment(), RecipesAdapter.Listener, MenuProvider {
+class RecipesFragment : Fragment(), RecipesAdapter.Listener, MenuProvider, SearchView.OnQueryTextListener, DialogInterface.OnClickListener {
 
     private lateinit var binding: FragmentRecipesBinding
 
@@ -63,8 +65,8 @@ class RecipesFragment : Fragment(), RecipesAdapter.Listener, MenuProvider {
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
         menuInflater.inflate(R.menu.menu_main, menu)
         val searchView = menu.findItem(R.id.search)?.actionView as? SearchView
-        //searchView?.setQuery(viewModel.query, false)
-        //searchView?.setOnQueryTextListener(this)
+        searchView?.setQuery(viewModel.query, false)
+        searchView?.setOnQueryTextListener(this)
     }
 
     private fun openAddRecipeFragment(id: Long = -1, edit: Boolean = false) {
@@ -79,10 +81,10 @@ class RecipesFragment : Fragment(), RecipesAdapter.Listener, MenuProvider {
                 true
             }
             R.id.sort -> {
-                /*AlertDialog.Builder(requireContext())
+                AlertDialog.Builder(requireContext())
                     .setTitle(R.string.sort)
                     .setSingleChoiceItems(R.array.sort, viewModel.sort.ordinal, this)
-                    .show()*/
+                    .show()
                 true
             }
             else -> false
@@ -105,5 +107,17 @@ class RecipesFragment : Fragment(), RecipesAdapter.Listener, MenuProvider {
             .setNegativeButton(android.R.string.cancel) { dialog, _ -> dialog.dismiss() }
             .show()
     }
+
+    override fun onClick(dialog: DialogInterface?, position: Int) {
+        viewModel.setSort(SortOrder.values()[position])
+        dialog?.dismiss()
+    }
+
+    override fun onQueryTextChange(newText: String?): Boolean {
+        viewModel.setQuery(newText.orEmpty())
+        return true
+    }
+
+    override fun onQueryTextSubmit(query: String?): Boolean = false
 
 }

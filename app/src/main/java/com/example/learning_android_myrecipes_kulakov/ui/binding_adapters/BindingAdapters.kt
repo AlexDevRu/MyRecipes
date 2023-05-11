@@ -13,7 +13,7 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 
 
-@BindingAdapter("app:uri")
+@BindingAdapter("uri")
 fun loadImage(view: ImageView, uri: Uri?) {
     Glide.with(view)
         .load(uri)
@@ -21,7 +21,7 @@ fun loadImage(view: ImageView, uri: Uri?) {
         .into(view)
 }
 
-@BindingAdapter("app:uri")
+@BindingAdapter("uri")
 fun loadImage(view: ImageView, uri: String?) {
     Glide.with(view)
         .load(uri)
@@ -29,12 +29,12 @@ fun loadImage(view: ImageView, uri: String?) {
         .into(view)
 }
 
-@BindingAdapter("app:date")
+@BindingAdapter("date")
 fun setDate(textView: TextView, date: Long) {
     textView.text = Utils.formatDate(date)
 }
 
-@BindingAdapter("app:dropdownValues")
+@BindingAdapter("dropdownValues")
 fun setDropdownValues(textView: AutoCompleteTextView, dropdownValues: Array<out String>) {
     val adapter = ArrayAdapter(textView.context, android.R.layout.simple_list_item_1, dropdownValues)
     textView.setAdapter(adapter)
@@ -55,7 +55,7 @@ fun setSelectedValueListener(textView: AutoCompleteTextView, attrChange: Inverse
     textView.onItemClickListener = AdapterView.OnItemClickListener { _, _, _, _ -> attrChange.onChange() }
 }
 
-@BindingAdapter("app:chipValues")
+@BindingAdapter("chipValues")
 fun setChipValues(chipGroup: ChipGroup, chipValues: List<String>?) {
     if (chipGroup.childCount > 1)
         chipGroup.removeViews(0, chipGroup.size - 1)

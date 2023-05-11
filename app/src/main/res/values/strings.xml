@@ -20,6 +20,13 @@
     <string-array name="categories">
         <item>Soup</item>
         <item>Desert</item>
+        <item>Salad</item>
     </string-array>
     <string name="delete_confirmation">Are you sure you want to delete this good permanently?</string>
+    <string-array name="sort">
+        <item>A-Z</item>
+        <item>Z-A</item>
+        <item>By time asc</item>
+        <item>By time desc</item>
+    </string-array>
 </resources>
