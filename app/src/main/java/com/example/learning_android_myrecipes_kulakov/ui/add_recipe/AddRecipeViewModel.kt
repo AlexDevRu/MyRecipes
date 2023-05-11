@@ -82,6 +82,10 @@ class AddRecipeViewModel @Inject constructor(
         ingredients.set(ingredients.get().orEmpty() + ingredient)
     }
 
+    fun removeIngredient(ingredient: String) {
+        ingredients.set(ingredients.get().orEmpty() - ingredient)
+    }
+
     fun save() {
         viewModelScope.launch {
             val recipe = Recipe(

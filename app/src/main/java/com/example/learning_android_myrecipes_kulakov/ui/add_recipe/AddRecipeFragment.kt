@@ -27,6 +27,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.example.learning_android_myrecipes_kulakov.R
 import com.example.learning_android_myrecipes_kulakov.Utils.disable
 import com.example.learning_android_myrecipes_kulakov.databinding.FragmentAddRecipeBinding
+import com.google.android.material.chip.Chip
 import com.google.android.material.textfield.TextInputLayout
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -36,7 +37,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @AndroidEntryPoint
-class AddRecipeFragment : Fragment(), View.OnClickListener, DialogInterface.OnClickListener, OnTimeSetListener {
+class AddRecipeFragment : Fragment(), View.OnClickListener, DialogInterface.OnClickListener, OnTimeSetListener, View.OnLongClickListener {
 
     private lateinit var binding: FragmentAddRecipeBinding
 
@@ -62,6 +63,7 @@ class AddRecipeFragment : Fragment(), View.OnClickListener, DialogInterface.OnCl
     }
 
     private var editMode = false
+    private var addMode = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -75,9 +77,10 @@ class AddRecipeFragment : Fragment(), View.OnClickListener, DialogInterface.OnCl
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.viewModel = viewModel
+        binding.listener = this
         binding.lifecycleOwner = viewLifecycleOwner
 
-        val addMode = requireArguments().getLong(ID) < 0
+        addMode = requireArguments().getLong(ID) < 0
         editMode = requireArguments().getBoolean(EDIT, false) && !addMode
 
         binding.btnSave.isVisible = editMode || addMode
@@ -156,6 +159,7 @@ class AddRecipeFragment : Fragment(), View.OnClickListener, DialogInterface.OnCl
         uri = FileProvider.getUriForFile(requireContext(), "com.example.learning_android_myrecipes_kulakov.fileprovider", file)
         intent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
         cameraLauncher.launch(intent)
+
     }
 
     private fun openGallery() {
@@ -165,6 +169,19 @@ class AddRecipeFragment : Fragment(), View.OnClickListener, DialogInterface.OnCl
 
     override fun onTimeSet(p0: TimePicker?, hours: Int, minutes: Int) {
         viewModel.setTime(hours, minutes)
+    }
+
+    override fun onLongClick(view: View?): Boolean {
+        if (!editMode && !addMode) return false
+        val chip = view as? Chip ?: return false
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.delete)
+            .setMessage(R.string.delete_ingredient_confirmation)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                viewModel.removeIngredient(chip.text.toString())
+            }
+            .show()
+        return true
     }
 
     companion object {

@@ -1,6 +1,7 @@
 package com.example.learning_android_myrecipes_kulakov.ui.binding_adapters
 
 import android.net.Uri
+import android.view.View
 import android.widget.*
 import androidx.core.view.size
 import androidx.databinding.BindingAdapter
@@ -55,14 +56,15 @@ fun setSelectedValueListener(textView: AutoCompleteTextView, attrChange: Inverse
     textView.onItemClickListener = AdapterView.OnItemClickListener { _, _, _, _ -> attrChange.onChange() }
 }
 
-@BindingAdapter("chipValues")
-fun setChipValues(chipGroup: ChipGroup, chipValues: List<String>?) {
+@BindingAdapter("chipValues", "onLongClickChipListener")
+fun setChipValues(chipGroup: ChipGroup, chipValues: List<String>?, onLongClickChipListener: View.OnLongClickListener) {
     if (chipGroup.childCount > 1)
         chipGroup.removeViews(0, chipGroup.size - 1)
     chipValues?.reversed()?.forEach {
         val chip = Chip(chipGroup.context)
         chip.text = it
         chip.isCheckable = false
+        chip.setOnLongClickListener(onLongClickChipListener)
         chipGroup.addView(chip, 0)
     }
 }
